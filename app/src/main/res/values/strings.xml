@@ -8,10 +8,10 @@
     <string name="essential_whatsapp">WhatsApp</string>
     <string name="home_menu">swipe up for menu</string>
     <string-array name="home_reminders">
-        <item>Work first. Scrolling never paid a bill.</item>
-        <item>Not hungry, just bored. Close the fridge.</item>
-        <item>Drink water now. You are a dried up plant.</item>
-        <item>Stand up and walk. Your chair is winning.</item>
+        <item>GRIND. NO EXCUSES.</item>
+        <item>PUT THE FOOD DOWN.</item>
+        <item>CHUG WATER. NOW.</item>
+        <item>GET UP. WALK.</item>
     </string-array>
     <string name="home_no_distractions">No distractions opened today</string>
     <plurals name="home_opens_today">

@@ -4,7 +4,7 @@ A minimal Android launcher that makes distracting apps slow and awkward to reach
 
 ## What it does
 
-- **Home screen:** time, date, today's distraction count, three reminders, and only Phone, Messages and WhatsApp.
+- **Home screen:** time, date, today's distraction count, four hard reminders, and only Phone, Messages and WhatsApp.
 - **Gestures:** swipe up anywhere on home to slide the menu open, swipe down to pull the notification shade.
 - **Menu:** every other app in a text grid that is shuffled on every visit. Search only matches the **full** app name, so there is no autocomplete to lean on. Distraction apps carry a small dot.
 - **Gate:** opening a distraction app shows a countdown (5 to 60 seconds) and asks why you are opening it (at least three words). Leaving the screen restarts the wait.
@@ -62,3 +62,7 @@ Switching keys requires uninstalling the old build once.
 ## Limits
 
 A launcher cannot block apps opened from notifications, the recents screen, or another launcher. Friction raises the cost of the habitual path, it does not lock the phone.
+
+## Credits
+
+Reminder font: [Rubik Distressed](https://fonts.google.com/specimen/Rubik+Distressed), SIL Open Font License 1.1 (see `licenses/`).

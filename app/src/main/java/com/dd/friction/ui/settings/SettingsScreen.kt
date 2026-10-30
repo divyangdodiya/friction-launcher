@@ -2,6 +2,7 @@ package com.dd.friction.ui.settings
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -84,6 +85,7 @@ private fun SettingsContent(
         contentPadding = PaddingValues(horizontal = 32.dp, vertical = 24.dp),
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .safeDrawingPadding(),
     ) {
         item {

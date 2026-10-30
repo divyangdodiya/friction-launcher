@@ -3,6 +3,7 @@ package com.dd.friction.ui.home
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,8 +20,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -75,6 +80,7 @@ private fun HomeContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .verticalSwipes(
                 onSwipeUp = { currentOnOpenMenu() },
                 onSwipeDown = { currentOnSwipeDown() },
@@ -120,21 +126,34 @@ private fun HomeContent(
     }
 }
 
+/**
+ * Hard reminders in a scratched, distressed face, each line knocked slightly off angle
+ * so they read like something carved into the screen, not a polite to-do list.
+ */
 @Composable
 private fun Reminders() {
     Column {
-        stringArrayResource(R.array.home_reminders).forEach { reminder ->
-            // Hard reminders: full white and heavier than everything else on screen.
+        stringArrayResource(R.array.home_reminders).forEachIndexed { index, reminder ->
             Text(
                 text = reminder,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
+                style = ReminderStyle,
                 color = MaterialTheme.colorScheme.onBackground,
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier
+                    .padding(vertical = 6.dp)
+                    .rotate(ReminderTilts[index % ReminderTilts.size]),
             )
         }
     }
 }
+
+private val ReminderStyle = TextStyle(
+    fontFamily = FontFamily(Font(R.font.rubik_distressed)),
+    fontSize = 32.sp,
+    lineHeight = 36.sp,
+    letterSpacing = 0.5.sp,
+)
+
+private val ReminderTilts = listOf(-2.5f, 1.5f, -1f, 2.5f)
 
 /**
  * Swipe up anywhere opens the menu; swipe down pulls the notification shade.
