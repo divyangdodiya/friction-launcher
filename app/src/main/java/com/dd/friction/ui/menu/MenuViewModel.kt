@@ -15,20 +15,19 @@ import com.dd.friction.domain.repository.AppRepository
 import com.dd.friction.domain.repository.SettingsRepository
 import com.dd.friction.domain.usecase.FindExactAppUseCase
 import com.dd.friction.domain.usecase.ShuffleAppsUseCase
+import com.dd.friction.ui.model.AppItem
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+import kotlin.random.Random
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.random.Random
-
-data class MenuItem(val app: InstalledApp, val isDistraction: Boolean)
 
 data class MenuUiState(
-    val apps: List<MenuItem> = emptyList(),
-    val exactMatch: MenuItem? = null,
+    val apps: List<AppItem> = emptyList(),
+    val exactMatch: AppItem? = null,
     val showIcons: Boolean = false,
 )
 
@@ -54,7 +53,7 @@ class MenuViewModel @Inject constructor(
         snapshotFlow { query },
     ) { apps, settings, currentQuery ->
         val distractions = settings.distractionPackages
-        fun InstalledApp.toItem() = MenuItem(this, packageName in distractions)
+        fun InstalledApp.toItem() = AppItem(this, packageName in distractions)
 
         MenuUiState(
             apps = shuffleApps(apps, shuffleSeed).map { it.toItem() },

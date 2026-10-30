@@ -35,7 +35,10 @@ fun FrictionNavHost(
         popExitTransition = { ExitTransition.None },
     ) {
         composable<HomeRoute> {
-            HomeScreen(onOpenMenu = { navController.navigate(MenuRoute) })
+            HomeScreen(
+                onOpenMenu = { navController.navigate(MenuRoute) },
+                onOpenGate = { app -> navController.navigate(GateRoute(app.packageName, app.activityName)) },
+            )
         }
         // The menu slides up from the bottom like a sheet and slides back down on close.
         composable<MenuRoute>(

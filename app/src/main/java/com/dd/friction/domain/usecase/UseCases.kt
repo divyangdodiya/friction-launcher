@@ -22,6 +22,14 @@ class FindExactAppUseCase @Inject constructor() {
     }
 }
 
+/** The home screen apps in the user's order, skipping any that are no longer installed. */
+class ResolveHomeAppsUseCase @Inject constructor() {
+    operator fun invoke(apps: List<InstalledApp>, homePackages: List<String>): List<InstalledApp> {
+        val byPackage = apps.groupBy { it.packageName }
+        return homePackages.mapNotNull { byPackage[it]?.firstOrNull() }
+    }
+}
+
 class RecordDistractionOpenUseCase @Inject constructor(
     private val usageRepository: UsageRepository,
     private val timeSource: TimeSource,

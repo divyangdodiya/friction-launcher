@@ -5,10 +5,18 @@ data class FrictionSettings(
     val delaySeconds: Int = DEFAULT_DELAY_SECONDS,
     val requireIntention: Boolean = true,
     val showIcons: Boolean = false,
+    /**
+     * Packages shown on the home screen, in display order. Until the user edits the list,
+     * the data layer fills it with the device's dialer, SMS app and WhatsApp.
+     */
+    val homePackages: List<String> = emptyList(),
 ) {
     companion object {
         const val DEFAULT_DELAY_SECONDS = 15
         val DELAY_OPTIONS = listOf(5, 10, 15, 30, 60)
+
+        /** Keeps the clock, reminders and app list on one screen without crowding. */
+        const val MAX_HOME_APPS = 5
 
         /** Common time sinks, pre-marked on first run. Apps that are not installed are ignored. */
         val DEFAULT_DISTRACTIONS = setOf(

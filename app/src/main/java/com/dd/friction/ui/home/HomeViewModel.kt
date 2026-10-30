@@ -2,15 +2,18 @@ package com.dd.friction.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dd.friction.domain.model.EssentialApp
+import com.dd.friction.domain.model.InstalledApp
 import com.dd.friction.domain.repository.AppLauncher
+import com.dd.friction.domain.repository.AppRepository
+import com.dd.friction.domain.repository.SettingsRepository
 import com.dd.friction.domain.repository.SystemUi
 import com.dd.friction.domain.repository.UsageRepository
 import com.dd.friction.domain.time.TimeSource
+import com.dd.friction.domain.usecase.ResolveHomeAppsUseCase
+import com.dd.friction.ui.model.AppItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,18 +25,19 @@ import javax.inject.Inject
 data class HomeUiState(
     val now: ZonedDateTime,
     val opensToday: Int = 0,
-    val essentials: List<EssentialApp> = emptyList(),
+    val apps: List<AppItem> = emptyList(),
 )
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+    appRepository: AppRepository,
+    settingsRepository: SettingsRepository,
     usageRepository: UsageRepository,
+    private val resolveHomeApps: ResolveHomeAppsUseCase,
     private val appLauncher: AppLauncher,
     private val systemUi: SystemUi,
     private val timeSource: TimeSource,
 ) : ViewModel() {
-
-    private val essentials = MutableStateFlow<List<EssentialApp>>(emptyList())
 
     /** Emits once a minute, aligned to the minute boundary. */
     private val minuteTicker: Flow<ZonedDateTime> = flow {
@@ -48,12 +52,15 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = combine(
         minuteTicker,
         usageRepository.dailyOpens,
-        essentials,
-    ) { now, dailyOpens, available ->
+        appRepository.installedApps,
+        settingsRepository.settings,
+    ) { now, dailyOpens, apps, settings ->
         HomeUiState(
             now = now,
             opensToday = dailyOpens?.countOn(now.toLocalDate()) ?: 0,
-            essentials = available,
+            apps = resolveHomeApps(apps, settings.homePackages).map { app ->
+                AppItem(app, isDistraction = app.packageName in settings.distractionPackages)
+            },
         )
     }.stateIn(
         scope = viewModelScope,
@@ -61,18 +68,7 @@ class HomeViewModel @Inject constructor(
         initialValue = HomeUiState(now = timeSource.now()),
     )
 
-    init {
-        refreshEssentials()
-    }
-
-    /** Default dialer or SMS app may change while the launcher is in the background. */
-    fun refreshEssentials() {
-        essentials.value = EssentialApp.entries.filter { appLauncher.isAvailable(it) }
-    }
-
-    fun onEssentialClick(app: EssentialApp) {
-        appLauncher.launch(app)
-    }
+    fun launch(app: InstalledApp): Boolean = appLauncher.launch(app.packageName, app.activityName)
 
     fun onSwipeDown() {
         systemUi.expandNotifications()

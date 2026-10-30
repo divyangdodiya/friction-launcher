@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,14 +32,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dd.friction.R
 import com.dd.friction.domain.model.FrictionSettings
+import com.dd.friction.domain.model.InstalledApp
 import com.dd.friction.domain.model.SettingChange
 import com.dd.friction.domain.model.UnlockPhrase
 import com.dd.friction.ui.components.PlainTextButton
+import com.dd.friction.ui.model.AppItem
 
 @Composable
 fun SettingsScreen(
@@ -52,6 +56,8 @@ fun SettingsScreen(
         state = state,
         onBack = onBack,
         onRequest = viewModel::request,
+        onAddHomeApp = viewModel::openHomeAppPicker,
+        onRemoveHomeApp = viewModel::removeHomeApp,
         onOpenHomeSettings = {
             runCatching {
                 context.startActivity(
@@ -60,6 +66,14 @@ fun SettingsScreen(
             }
         },
     )
+
+    if (viewModel.isPickingHomeApp) {
+        HomeAppPicker(
+            candidates = state.homeCandidates,
+            onPick = viewModel::addHomeApp,
+            onDismiss = viewModel::closeHomeAppPicker,
+        )
+    }
 
     viewModel.pendingChange?.let { change ->
         ConfirmDialog(
@@ -78,6 +92,8 @@ private fun SettingsContent(
     state: SettingsUiState,
     onBack: () -> Unit,
     onRequest: (SettingChange) -> Unit,
+    onAddHomeApp: () -> Unit,
+    onRemoveHomeApp: (InstalledApp) -> Unit,
     onOpenHomeSettings: () -> Unit,
 ) {
     val settings = state.settings
@@ -100,6 +116,55 @@ private fun SettingsContent(
                     onClick = onBack,
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        item {
+            SectionTitle(stringResource(R.string.settings_home_apps_title))
+            Text(
+                text = stringResource(
+                    R.string.settings_home_apps_hint,
+                    state.homeApps.size,
+                    FrictionSettings.MAX_HOME_APPS,
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+            Spacer(Modifier.height(8.dp))
+            if (state.homeApps.isEmpty()) {
+                Text(
+                    text = stringResource(R.string.settings_home_apps_empty),
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(vertical = 12.dp),
+                )
+            }
+        }
+
+        items(items = state.homeApps, key = { "home:${it.app.packageName}" }) { item ->
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                AppLabel(item = item, modifier = Modifier.weight(1f))
+                PlainTextButton(
+                    text = stringResource(R.string.settings_remove),
+                    onClick = { onRemoveHomeApp(item.app) },
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        item {
+            if (state.canAddHomeApp) {
+                PlainTextButton(
+                    text = stringResource(R.string.settings_home_apps_add),
+                    onClick = onAddHomeApp,
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.settings_home_apps_full),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(vertical = 12.dp),
                 )
             }
         }
@@ -157,7 +222,7 @@ private fun SettingsContent(
             }
         }
 
-        items(items = state.distractions, key = { it.packageName }) { app ->
+        items(items = state.distractions, key = { "distraction:${it.packageName}" }) { app ->
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = app.label,
@@ -182,6 +247,62 @@ private fun SettingsContent(
         }
     }
 }
+
+/** App name, with a muted tag when it is a distraction. */
+@Composable
+private fun AppLabel(item: AppItem, modifier: Modifier = Modifier) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = modifier) {
+        Text(
+            text = item.app.label,
+            style = MaterialTheme.typography.bodyLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false),
+        )
+        if (item.isDistraction) {
+            Text(
+                text = stringResource(R.string.settings_distraction_tag),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun HomeAppPicker(
+    candidates: List<AppItem>,
+    onPick: (InstalledApp) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.settings_home_apps_pick)) },
+        text = {
+            LazyColumn(modifier = Modifier.heightIn(max = PickerMaxHeight)) {
+                items(items = candidates, key = { it.app.packageName }) { item ->
+                    AppLabel(
+                        item = item,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable(role = Role.Button) { onPick(item.app) }
+                            .padding(vertical = 12.dp),
+                    )
+                }
+            }
+        },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.settings_cancel))
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+    )
+}
+
+private val PickerMaxHeight = 420.dp
 
 @Composable
 private fun SectionTitle(text: String) {
@@ -266,5 +387,6 @@ private fun SettingChange.description(): String = when (this) {
     is SettingChange.RequireIntention -> stringResource(R.string.confirm_intention_off)
     is SettingChange.ShowIcons -> stringResource(R.string.confirm_icons_on)
     is SettingChange.RemoveDistraction -> stringResource(R.string.confirm_remove, label)
-    is SettingChange.AddDistraction -> ""
+    is SettingChange.AddHomeApp -> stringResource(R.string.confirm_home_add, label)
+    is SettingChange.AddDistraction, is SettingChange.RemoveHomeApp -> ""
 }

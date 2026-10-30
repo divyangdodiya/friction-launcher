@@ -1,7 +1,6 @@
 package com.dd.friction.domain.repository
 
 import com.dd.friction.domain.model.DailyCount
-import com.dd.friction.domain.model.EssentialApp
 import com.dd.friction.domain.model.FrictionSettings
 import com.dd.friction.domain.model.InstalledApp
 import com.dd.friction.domain.model.SettingChange
@@ -31,6 +30,4 @@ interface SystemUi {
 
 interface AppLauncher {
     fun launch(packageName: String, activityName: String): Boolean
-    fun launch(essential: EssentialApp): Boolean
-    fun isAvailable(essential: EssentialApp): Boolean
 }

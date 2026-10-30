@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -55,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dd.friction.R
 import com.dd.friction.domain.model.InstalledApp
 import com.dd.friction.ui.components.PlainTextButton
+import com.dd.friction.ui.model.AppItem
 
 private const val GRID_COLUMNS = 3
 private val IconSize = 40.dp
@@ -72,7 +73,7 @@ fun MenuScreen(
     val haptics = LocalHapticFeedback.current
 
     // Distractions always go through the gate; everything else opens directly.
-    val onAppClick: (MenuItem) -> Unit = { item ->
+    val onAppClick: (AppItem) -> Unit = { item ->
         if (item.isDistraction) {
             onOpenGate(item.app)
         } else if (viewModel.launch(item.app)) {
@@ -104,8 +105,8 @@ private fun MenuContent(
     state: MenuUiState,
     query: String,
     onQueryChange: (String) -> Unit,
-    onAppClick: (MenuItem) -> Unit,
-    onAppLongClick: (MenuItem) -> Unit,
+    onAppClick: (AppItem) -> Unit,
+    onAppLongClick: (AppItem) -> Unit,
     onOpenSettings: () -> Unit,
     loadIcon: suspend (InstalledApp, Int) -> Bitmap?,
 ) {
@@ -210,7 +211,7 @@ private fun SearchField(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AppCell(
-    item: MenuItem,
+    item: AppItem,
     showIcon: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
