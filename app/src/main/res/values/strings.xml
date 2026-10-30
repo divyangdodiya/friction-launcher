@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Friction</string>
+
+    <!-- Home -->
+    <string name="essential_phone">Phone</string>
+    <string name="essential_messages">Messages</string>
+    <string name="essential_whatsapp">WhatsApp</string>
+    <string name="home_menu">menu</string>
+    <string name="home_no_distractions">No distractions opened today</string>
+    <plurals name="home_opens_today">
+        <item quantity="one">%d distraction opened today</item>
+        <item quantity="other">%d distractions opened today</item>
+    </plurals>
+
+    <!-- Menu -->
+    <string name="menu_search_hint">Type the full app name</string>
+    <string name="menu_settings">settings</string>
+    <string name="menu_open_match">Open %1$s</string>
+    <string name="menu_marked_distraction">%1$s is now a distraction</string>
+
+    <!-- Gate -->
+    <string name="gate_opening">You are about to open</string>
+    <string name="gate_question">Why are you opening it?</string>
+    <string name="gate_hint">At least three words</string>
+    <string name="gate_cancel">Never mind</string>
+    <string name="gate_open">Open anyway</string>
+    <string name="gate_open_in">Open in %1$ds</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_done">done</string>
+    <string name="settings_delay_title">Wait before opening a distraction</string>
+    <string name="settings_delay_option">%1$ds</string>
+    <string name="settings_intention">Ask why I am opening a distraction</string>
+    <string name="settings_icons">Show app icons (grayscale)</string>
+    <string name="settings_distractions_title">Distractions</string>
+    <string name="settings_distractions_hint">Long press any app in the menu to add it here. Removing one needs confirmation.</string>
+    <string name="settings_distractions_empty">No distractions installed yet.</string>
+    <string name="settings_remove">remove</string>
+    <string name="settings_home_title">Home app</string>
+    <string name="settings_home_action">Change default home app</string>
+
+    <!-- Confirmation -->
+    <string name="confirm_title">Lowering your friction</string>
+    <string name="confirm_instruction">Type the sentence below to continue.</string>
+    <string name="confirm_button">Confirm</string>
+    <string name="confirm_keep">Keep friction</string>
+    <string name="confirm_delay">Shorten the wait to %1$d seconds.</string>
+    <string name="confirm_intention_off">Stop asking why you open distractions.</string>
+    <string name="confirm_icons_on">Show app icons in the menu.</string>
+    <string name="confirm_remove">Remove %1$s from distractions.</string>
+</resources>
