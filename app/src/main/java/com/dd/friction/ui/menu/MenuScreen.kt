@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,6 +35,7 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.SolidColor
@@ -230,8 +233,20 @@ private fun AppCell(
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+        // Fixed-height slot so marked and unmarked cells line up in the grid.
+        Spacer(Modifier.height(6.dp))
+        Box(
+            modifier = Modifier
+                .size(DistractionDotSize)
+                .background(
+                    color = if (item.isDistraction) MaterialTheme.colorScheme.onSurfaceVariant else Color.Transparent,
+                    shape = CircleShape,
+                ),
+        )
     }
 }
+
+private val DistractionDotSize = 5.dp
 
 @Composable
 private fun AppIcon(

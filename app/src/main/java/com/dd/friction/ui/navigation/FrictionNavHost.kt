@@ -2,6 +2,9 @@ package com.dd.friction.ui.navigation
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -11,6 +14,8 @@ import com.dd.friction.ui.gate.GateScreen
 import com.dd.friction.ui.home.HomeScreen
 import com.dd.friction.ui.menu.MenuScreen
 import com.dd.friction.ui.settings.SettingsScreen
+
+private const val SLIDE_MILLIS = 250
 
 @Composable
 fun FrictionNavHost(
@@ -32,7 +37,11 @@ fun FrictionNavHost(
         composable<HomeRoute> {
             HomeScreen(onOpenMenu = { navController.navigate(MenuRoute) })
         }
-        composable<MenuRoute> {
+        // The menu slides up from the bottom like a sheet and slides back down on close.
+        composable<MenuRoute>(
+            enterTransition = { slideInVertically(tween(SLIDE_MILLIS)) { fullHeight -> fullHeight } },
+            popExitTransition = { slideOutVertically(tween(SLIDE_MILLIS)) { fullHeight -> fullHeight } },
+        ) {
             MenuScreen(
                 onOpenGate = { app -> navController.navigate(GateRoute(app.packageName, app.activityName)) },
                 onOpenSettings = { navController.navigate(SettingsRoute) },

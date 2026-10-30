@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Normal permission, granted at install: lets a swipe down open the notification shade. -->
+    <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
+
     <!-- Package visibility (Android 11+): only what a launcher needs to see. -->
     <queries>
         <intent>

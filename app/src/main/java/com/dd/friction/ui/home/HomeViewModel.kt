@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd.friction.domain.model.EssentialApp
 import com.dd.friction.domain.repository.AppLauncher
+import com.dd.friction.domain.repository.SystemUi
 import com.dd.friction.domain.repository.UsageRepository
 import com.dd.friction.domain.time.TimeSource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,6 +29,7 @@ data class HomeUiState(
 class HomeViewModel @Inject constructor(
     usageRepository: UsageRepository,
     private val appLauncher: AppLauncher,
+    private val systemUi: SystemUi,
     private val timeSource: TimeSource,
 ) : ViewModel() {
 
@@ -70,6 +72,10 @@ class HomeViewModel @Inject constructor(
 
     fun onEssentialClick(app: EssentialApp) {
         appLauncher.launch(app)
+    }
+
+    fun onSwipeDown() {
+        systemUi.expandNotifications()
     }
 
     private companion object {

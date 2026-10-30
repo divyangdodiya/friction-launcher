@@ -3,6 +3,7 @@ package com.dd.friction.ui.home
 import android.text.format.DateFormat
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,8 +14,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,6 +30,8 @@ import com.dd.friction.domain.model.EssentialApp
 import com.dd.friction.ui.components.PlainTextButton
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+
+private val SwipeThreshold = 64.dp
 
 @Composable
 fun HomeScreen(
@@ -42,6 +48,7 @@ fun HomeScreen(
         state = state,
         onEssentialClick = viewModel::onEssentialClick,
         onOpenMenu = onOpenMenu,
+        onSwipeDown = viewModel::onSwipeDown,
     )
 }
 
@@ -50,6 +57,7 @@ private fun HomeContent(
     state: HomeUiState,
     onEssentialClick: (EssentialApp) -> Unit,
     onOpenMenu: () -> Unit,
+    onSwipeDown: () -> Unit,
 ) {
     val context = LocalContext.current
     val timePattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"
@@ -60,14 +68,20 @@ private fun HomeContent(
     } else {
         context.resources.getQuantityString(R.plurals.home_opens_today, state.opensToday, state.opensToday)
     }
+    val currentOnOpenMenu by rememberUpdatedState(onOpenMenu)
+    val currentOnSwipeDown by rememberUpdatedState(onSwipeDown)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalSwipes(
+                onSwipeUp = { currentOnOpenMenu() },
+                onSwipeDown = { currentOnSwipeDown() },
+            )
             .safeDrawingPadding()
             .padding(horizontal = 32.dp, vertical = 24.dp),
     ) {
-        Spacer(Modifier.weight(1f))
+        Spacer(Modifier.height(32.dp))
 
         Text(text = state.now.format(timeFormatter), style = MaterialTheme.typography.displayLarge)
         Text(
@@ -82,6 +96,8 @@ private fun HomeContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
+        Spacer(Modifier.weight(1f))
+        Reminders()
         Spacer(Modifier.weight(1f))
 
         state.essentials.forEach { app ->
@@ -102,6 +118,45 @@ private fun HomeContent(
         )
     }
 }
+
+@Composable
+private fun Reminders() {
+    Column {
+        stringArrayResource(R.array.home_reminders).forEach { reminder ->
+            Text(
+                text = reminder,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(vertical = 6.dp),
+            )
+        }
+    }
+}
+
+/**
+ * Swipe up anywhere opens the menu; swipe down pulls the notification shade.
+ * The detector is installed once, so callers pass lambdas that read current state.
+ */
+private fun Modifier.verticalSwipes(onSwipeUp: () -> Unit, onSwipeDown: () -> Unit): Modifier =
+    pointerInput(Unit) {
+        val threshold = SwipeThreshold.toPx()
+        var totalDrag = 0f
+        detectVerticalDragGestures(
+            onDragStart = { totalDrag = 0f },
+            onDragCancel = { totalDrag = 0f },
+            onDragEnd = {
+                when {
+                    totalDrag < -threshold -> onSwipeUp()
+                    totalDrag > threshold -> onSwipeDown()
+                }
+                totalDrag = 0f
+            },
+            onVerticalDrag = { change, dragAmount ->
+                change.consume()
+                totalDrag += dragAmount
+            },
+        )
+    }
 
 @StringRes
 private fun EssentialApp.labelRes(): Int = when (this) {

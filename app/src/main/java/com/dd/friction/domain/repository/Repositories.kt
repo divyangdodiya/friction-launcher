@@ -24,6 +24,11 @@ interface UsageRepository {
     suspend fun recordOpen(day: LocalDate)
 }
 
+interface SystemUi {
+    /** Pulls down the notification shade. Returns false if the device does not allow it. */
+    fun expandNotifications(): Boolean
+}
+
 interface AppLauncher {
     fun launch(packageName: String, activityName: String): Boolean
     fun launch(essential: EssentialApp): Boolean
