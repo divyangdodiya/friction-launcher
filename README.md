@@ -4,12 +4,12 @@ A minimal Android launcher that makes distracting apps slow and awkward to reach
 
 ## What it does
 
-- **Home screen:** time, date, four hard reminders, and up to 5 apps you choose (Phone, Messages and WhatsApp by default). Distractions placed on home still go through the gate.
+- **Home screen:** time, date, today's distraction count, four hard reminders, and up to 5 apps you choose (Phone, Messages and WhatsApp by default). Distractions placed on home still go through the gate.
 - **Gestures:** swipe up anywhere on home to slide the menu open, swipe down to pull the notification shade.
 - **Menu:** every other app in a text grid that is shuffled on every visit. Search only matches the **full** app name, so there is no autocomplete to lean on. Distraction apps carry a small dot.
 - **Gate:** opening a distraction app shows a countdown (5 to 60 seconds) and asks why you are opening it (at least three words). Leaving the screen restarts the wait.
 - **Distraction list:** common browsers, video and social apps are pre-marked. Long press any app in the menu to add it.
-- **Lowering friction costs effort:** shortening the wait, turning off the question, showing icons, or removing an app from the list, or putting a distraction on the home screen all require typing *I choose distraction over focus*.
+- **Lowering friction costs effort:** shortening the wait, turning off the question, showing icons, removing an app from the list, or putting a distraction on the home screen all require typing *I choose distraction over focus*.
 - Monochrome, text only by default (optional grayscale icons), no animations.
 
 ## Install
