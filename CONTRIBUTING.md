@@ -13,7 +13,7 @@ Thanks for helping. Friction is small on purpose, so a few guidelines keep it th
 Requirements: JDK 17 and the Android SDK.
 
 ```sh
-./gradlew testReleaseUnitTest lintRelease assembleRelease
+./gradlew testDebugUnitTest lintRelease assembleRelease
 ```
 
 All three must pass; CI runs the same commands on every pull request.

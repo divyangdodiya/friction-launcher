@@ -48,7 +48,7 @@ jobs:
           fi
 
       - name: Unit tests
-        run: ./gradlew testReleaseUnitTest --stacktrace
+        run: ./gradlew testDebugUnitTest --stacktrace
 
       - name: Lint
         id: lint
