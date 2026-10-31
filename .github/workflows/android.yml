@@ -30,7 +30,7 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       # Secrets are not available to pull requests from forks, so those builds use the debug key.
       - name: Set up release signing
