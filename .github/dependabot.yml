@@ -1,5 +1,6 @@
 version: 2
 updates:
+  # Libraries and build plugins: one grouped pull request per month.
   - package-ecosystem: gradle
     directory: /
     schedule:
@@ -8,7 +9,11 @@ updates:
       gradle:
         patterns: ["*"]
 
+  # CI actions: one grouped pull request per month instead of one per action.
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: monthly
+    groups:
+      github-actions:
+        patterns: ["*"]
