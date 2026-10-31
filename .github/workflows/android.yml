@@ -51,7 +51,12 @@ jobs:
         run: ./gradlew testReleaseUnitTest --stacktrace
 
       - name: Lint
+        id: lint
         run: ./gradlew lintRelease --stacktrace
+
+      - name: Annotate lint issues
+        if: always() && steps.lint.outcome != 'skipped'
+        run: python3 .github/scripts/lint_annotations.py app/build/reports/lint-results-release.xml
 
       - name: Build APK
         env:
