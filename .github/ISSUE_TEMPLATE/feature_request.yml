@@ -1,0 +1,22 @@
+name: Feature request
+description: Suggest an idea
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What habit or problem should this help with?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How it would work from the user's side.
+    validations:
+      required: true
+  - type: textarea
+    id: friction
+    attributes:
+      label: Does it add or remove friction?
+      description: Friction should make distractions harder, not the phone harder to use. How does this fit?

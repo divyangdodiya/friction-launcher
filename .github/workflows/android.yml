@@ -1,4 +1,4 @@
-name: Build APK
+name: Build
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,12 +16,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       VERSION_CODE: ${{ github.run_number }}
-      SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
-      SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-      SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-      SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+      VERSION_NAME: 1.0.${{ github.run_number }}
 
     steps:
       - uses: actions/checkout@v4
@@ -33,30 +32,50 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Use private signing key if configured
-        if: env.SIGNING_KEYSTORE_BASE64 != ''
+      # Secrets are not available to pull requests from forks, so those builds use the debug key.
+      - name: Set up release signing
+        id: signing
+        env:
+          SIGNING_KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
         run: |
-          echo "$SIGNING_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
-          echo "SIGNING_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+          if [ -n "$SIGNING_KEYSTORE_BASE64" ]; then
+            echo "$SIGNING_KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            echo "SIGNING_KEYSTORE_PATH=$RUNNER_TEMP/release.keystore" >> "$GITHUB_ENV"
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::No signing secrets configured. Building with the debug key and skipping the release."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Unit tests
         run: ./gradlew testReleaseUnitTest --stacktrace
 
-      - name: Build release APK
+      - name: Lint
+        run: ./gradlew lintRelease --stacktrace
+
+      - name: Build APK
+        env:
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         run: |
           ./gradlew assembleRelease --stacktrace
-          cp app/build/outputs/apk/release/app-release.apk "friction-1.0.${{ github.run_number }}.apk"
+          cp app/build/outputs/apk/release/app-release.apk "friction-$VERSION_NAME.apk"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: friction-1.0.${{ github.run_number }}
-          path: friction-1.0.${{ github.run_number }}.apk
+          name: friction-${{ env.VERSION_NAME }}
+          path: friction-${{ env.VERSION_NAME }}.apk
 
       - name: Publish release
-        if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+        if: >-
+          steps.signing.outputs.signed == 'true' &&
+          github.event_name != 'pull_request' &&
+          github.ref == 'refs/heads/main'
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v1.0.${{ github.run_number }}
-          name: Friction 1.0.${{ github.run_number }}
-          files: friction-1.0.${{ github.run_number }}.apk
+          tag_name: v${{ env.VERSION_NAME }}
+          name: Friction ${{ env.VERSION_NAME }}
+          files: friction-${{ env.VERSION_NAME }}.apk
+          generate_release_notes: true
           make_latest: true

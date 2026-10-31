@@ -22,21 +22,18 @@ android {
         versionName = "1.0.$ciVersionCode"
     }
 
+    // Official releases are signed in CI with a private key from repository secrets.
+    // Local builds and forks fall back to the standard Android debug key.
+    val releaseKeystore = providers.environmentVariable("SIGNING_KEYSTORE_PATH").orNull
+    val hasReleaseKey = !releaseKeystore.isNullOrBlank()
+
     signingConfigs {
-        create("release") {
-            // A private key from CI secrets when present, otherwise the committed dev key,
-            // so APKs from every build share one signature and install as updates.
-            val keystorePath = System.getenv("SIGNING_KEYSTORE_PATH")
-            if (!keystorePath.isNullOrBlank()) {
-                storeFile = file(keystorePath)
-                storePassword = System.getenv("SIGNING_STORE_PASSWORD")
-                keyAlias = System.getenv("SIGNING_KEY_ALIAS")
-                keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
-            } else {
-                storeFile = rootProject.file("keystore/dev.keystore")
-                storePassword = "android"
-                keyAlias = "androiddebugkey"
-                keyPassword = "android"
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(releaseKeystore!!)
+                storePassword = providers.environmentVariable("SIGNING_STORE_PASSWORD").orNull
+                keyAlias = providers.environmentVariable("SIGNING_KEY_ALIAS").orNull
+                keyPassword = providers.environmentVariable("SIGNING_KEY_PASSWORD").orNull
             }
         }
     }
@@ -49,7 +46,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.getByName(if (hasReleaseKey) "release" else "debug")
         }
     }
 
