@@ -49,7 +49,7 @@ Requirements: JDK 17 and the Android SDK (Android Studio Ladybug or newer works 
 ```sh
 git clone https://github.com/divyangdodiya/friction-launcher.git
 cd friction-launcher
-./gradlew testReleaseUnitTest assembleRelease
+./gradlew testDebugUnitTest assembleRelease
 ```
 
 Local builds are signed with your Android debug key. Android rejects updates signed with a different key, so uninstall the official build before installing your own.

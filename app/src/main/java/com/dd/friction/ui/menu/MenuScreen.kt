@@ -47,13 +47,14 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dd.friction.R
 import com.dd.friction.domain.model.InstalledApp
@@ -73,6 +74,7 @@ fun MenuScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val resources = LocalResources.current
     val haptics = LocalHapticFeedback.current
 
     // Distractions always go through the gate; everything else opens directly.
@@ -94,7 +96,7 @@ fun MenuScreen(
             viewModel.markAsDistraction(item.app)
             Toast.makeText(
                 context,
-                context.getString(R.string.menu_marked_distraction, item.app.label),
+                resources.getString(R.string.menu_marked_distraction, item.app.label),
                 Toast.LENGTH_SHORT,
             ).show()
         },

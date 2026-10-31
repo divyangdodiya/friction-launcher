@@ -4,7 +4,7 @@
 
 ## Checklist
 
-- [ ] `./gradlew testReleaseUnitTest lintRelease assembleRelease` passes
+- [ ] `./gradlew testDebugUnitTest lintRelease assembleRelease` passes
 - [ ] Rules in `domain/` that changed have unit tests
 - [ ] No new permissions, or the reason is explained above
 - [ ] Screenshots attached for UI changes
