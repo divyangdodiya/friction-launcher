@@ -44,7 +44,7 @@
     <string name="settings_home_title">Default launcher</string>
     <string name="settings_home_action">Change default home app</string>
     <string name="settings_home_apps_title">Home screen</string>
-    <string name="settings_home_apps_hint">Apps one tap away on your home screen. %1$d of %2$d used. Distractions still go through the wait.</string>
+    <string name="settings_home_apps_hint">Apps one tap away on your home screen (%1$d/%2$d). Distractions still go through the wait.</string>
     <string name="settings_home_apps_empty">No apps on your home screen.</string>
     <string name="settings_home_apps_add">+ add app</string>
     <string name="settings_home_apps_full">Home screen is full. Remove one to add another.</string>
@@ -57,7 +57,10 @@
     <string name="confirm_instruction">Type the sentence below to continue.</string>
     <string name="confirm_button">Confirm</string>
     <string name="confirm_keep">Keep friction</string>
-    <string name="confirm_delay">Shorten the wait to %1$d seconds.</string>
+    <plurals name="confirm_delay">
+        <item quantity="one">Shorten the wait to %1$d second.</item>
+        <item quantity="other">Shorten the wait to %1$d seconds.</item>
+    </plurals>
     <string name="confirm_intention_off">Stop asking why you open distractions.</string>
     <string name="confirm_icons_on">Show app icons in the menu.</string>
     <string name="confirm_remove">Remove %1$s from distractions.</string>

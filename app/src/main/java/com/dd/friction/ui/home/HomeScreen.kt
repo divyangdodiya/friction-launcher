@@ -16,11 +16,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
@@ -37,7 +40,6 @@ import com.dd.friction.domain.model.InstalledApp
 import com.dd.friction.ui.components.PlainTextButton
 import com.dd.friction.ui.model.AppItem
 import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 private val SwipeThreshold = 64.dp
 
@@ -71,13 +73,18 @@ private fun HomeContent(
     onSwipeDown: () -> Unit,
 ) {
     val context = LocalContext.current
-    val timePattern = if (DateFormat.is24HourFormat(context)) "HH:mm" else "h:mm"
-    val timeFormatter = DateTimeFormatter.ofPattern(timePattern, Locale.getDefault())
-    val dateFormatter = DateTimeFormatter.ofPattern("EEEE, d MMMM", Locale.getDefault())
+    // Locale comes from the configuration so a language change recomposes the clock.
+    // The 24-hour setting is re-read on every minute tick.
+    val locale = LocalConfiguration.current.locales[0]
+    val is24Hour = DateFormat.is24HourFormat(context)
+    val timeFormatter = remember(locale, is24Hour) {
+        DateTimeFormatter.ofPattern(if (is24Hour) "HH:mm" else "h:mm", locale)
+    }
+    val dateFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE, d MMMM", locale) }
     val opensText = if (state.opensToday == 0) {
         stringResource(R.string.home_no_distractions)
     } else {
-        context.resources.getQuantityString(R.plurals.home_opens_today, state.opensToday, state.opensToday)
+        pluralStringResource(R.plurals.home_opens_today, state.opensToday, state.opensToday)
     }
     val currentOnOpenMenu by rememberUpdatedState(onOpenMenu)
     val currentOnSwipeDown by rememberUpdatedState(onSwipeDown)

@@ -29,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
@@ -383,7 +384,7 @@ private fun ConfirmDialog(
 
 @Composable
 private fun SettingChange.description(): String = when (this) {
-    is SettingChange.Delay -> stringResource(R.string.confirm_delay, seconds)
+    is SettingChange.Delay -> pluralStringResource(R.plurals.confirm_delay, seconds, seconds)
     is SettingChange.RequireIntention -> stringResource(R.string.confirm_intention_off)
     is SettingChange.ShowIcons -> stringResource(R.string.confirm_icons_on)
     is SettingChange.RemoveDistraction -> stringResource(R.string.confirm_remove, label)
