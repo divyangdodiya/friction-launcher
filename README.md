@@ -1,6 +1,6 @@
 # Friction
 
-[![Build](https://github.com/divyangdodiya/dd-friction-launcher/actions/workflows/android.yml/badge.svg)](https://github.com/divyangdodiya/dd-friction-launcher/actions/workflows/android.yml)
+[![Build](https://github.com/divyangdodiya/friction-launcher/actions/workflows/android.yml/badge.svg)](https://github.com/divyangdodiya/friction-launcher/actions/workflows/android.yml)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-black.svg)](LICENSE)
 ![Android 8.0+](https://img.shields.io/badge/Android-8.0%2B-black.svg)
 
@@ -36,7 +36,7 @@ Most digital wellbeing tools block apps and get switched off. Friction takes a d
 
 ## Install
 
-1. Download the latest `friction-*.apk` from [Releases](https://github.com/divyangdodiya/dd-friction-launcher/releases/latest) on your phone.
+1. Download the latest `friction-*.apk` from [Releases](https://github.com/divyangdodiya/friction-launcher/releases/latest) on your phone.
 2. Allow your browser to install unknown apps when prompted, then install.
 3. Press the home button and choose **Friction** as the default home app, or go to *Settings > Apps > Default apps > Home app*.
 
@@ -47,8 +47,8 @@ New releases install over the old one and keep your settings.
 Requirements: JDK 17 and the Android SDK (Android Studio Ladybug or newer works out of the box).
 
 ```sh
-git clone https://github.com/divyangdodiya/dd-friction-launcher.git
-cd dd-friction-launcher
+git clone https://github.com/divyangdodiya/friction-launcher.git
+cd friction-launcher
 ./gradlew testReleaseUnitTest assembleRelease
 ```
 
