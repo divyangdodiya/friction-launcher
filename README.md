@@ -8,6 +8,13 @@ A minimal Android launcher that makes distracting apps slow and awkward to reach
 
 Most digital wellbeing tools block apps and get switched off. Friction takes a different approach: everything still works, but the habitual path to a time sink gets longer, plainer and more deliberate, while the apps you actually need stay one tap away.
 
+## Screenshots
+
+| Home | Menu | Gate | Settings |
+| :---: | :---: | :---: | :---: |
+| <img src="docs/screenshots/1-home.png" width="200" alt="Home screen with clock, hard reminders and three quick-access apps"> | <img src="docs/screenshots/2-menu.png" width="200" alt="Shuffled text-only app menu with exact-name search"> | <img src="docs/screenshots/3-gate.png" width="200" alt="Gate asking why you are opening Chrome, with a countdown"> | <img src="docs/screenshots/4-settings.png" width="200" alt="Settings for home apps, wait time and the distraction list"> |
+| Clock, reminders and only the apps you need | Shuffled, text only, full-name search | Countdown and a reason before any distraction | Every change that lowers friction needs confirmation |
+
 ## Features
 
 **Home screen**
