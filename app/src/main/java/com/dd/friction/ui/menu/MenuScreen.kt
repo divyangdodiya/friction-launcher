@@ -30,14 +30,17 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -256,10 +259,10 @@ private fun AppIcon(
     loadIcon: suspend (InstalledApp, Int) -> Bitmap?,
 ) {
     val sizePx = with(LocalDensity.current) { IconSize.roundToPx() }
-    val bitmap by produceState<Bitmap?>(initialValue = null, app.key, sizePx) {
-        value = loadIcon(app, sizePx)
+    var imageBitmap by remember(app.key, sizePx) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(app.key, sizePx) {
+        imageBitmap = loadIcon(app, sizePx)?.asImageBitmap()
     }
-    val imageBitmap = remember(bitmap) { bitmap?.asImageBitmap() }
 
     Box(Modifier.size(IconSize)) {
         imageBitmap?.let {

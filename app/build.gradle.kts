@@ -64,8 +64,10 @@ android {
     }
 
     lint {
-        // Sideloaded personal app: Play Store target SDK deadlines do not apply.
+        // Distributed outside the Play Store, so its target SDK deadlines do not apply.
         disable += setOf("ExpiredTargetSdkVersion", "OldTargetApi")
+        // Dependabot proposes dependency updates, so version nags would only add noise.
+        disable += setOf("GradleDependency", "AndroidGradlePluginVersion", "NewerVersionAvailable")
     }
 }
 
