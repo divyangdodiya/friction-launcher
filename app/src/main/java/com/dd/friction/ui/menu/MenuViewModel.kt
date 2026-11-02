@@ -9,11 +9,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dd.friction.data.apps.AppIconLoader
 import com.dd.friction.domain.model.InstalledApp
+import com.dd.friction.domain.model.SearchMode
 import com.dd.friction.domain.model.SettingChange
 import com.dd.friction.domain.repository.AppLauncher
 import com.dd.friction.domain.repository.AppRepository
 import com.dd.friction.domain.repository.SettingsRepository
-import com.dd.friction.domain.usecase.FindExactAppUseCase
+import com.dd.friction.domain.usecase.SearchAppsUseCase
 import com.dd.friction.domain.usecase.ShuffleAppsUseCase
 import com.dd.friction.ui.model.AppItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,9 +26,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+/** A search hit. [showPackage] is set when another hit has the same name, so the two can be told apart. */
+data class SearchResult(val item: AppItem, val showPackage: Boolean)
+
 data class MenuUiState(
     val apps: List<AppItem> = emptyList(),
-    val exactMatch: AppItem? = null,
+    val isSearching: Boolean = false,
+    val results: List<SearchResult> = emptyList(),
+    val searchMode: SearchMode = SearchMode.DEFAULT,
     val showIcons: Boolean = false,
 )
 
@@ -36,7 +42,7 @@ class MenuViewModel @Inject constructor(
     appRepository: AppRepository,
     private val settingsRepository: SettingsRepository,
     private val shuffleApps: ShuffleAppsUseCase,
-    private val findExactApp: FindExactAppUseCase,
+    private val searchApps: SearchAppsUseCase,
     private val appLauncher: AppLauncher,
     private val iconLoader: AppIconLoader,
 ) : ViewModel() {
@@ -55,9 +61,16 @@ class MenuViewModel @Inject constructor(
         val distractions = settings.distractionPackages
         fun InstalledApp.toItem() = AppItem(this, packageName in distractions)
 
+        val hits = searchApps(apps, currentQuery, settings.searchMode, distractions)
+        val labelCounts = hits.groupingBy { it.label.lowercase() }.eachCount()
+
         MenuUiState(
             apps = shuffleApps(apps, shuffleSeed).map { it.toItem() },
-            exactMatch = findExactApp(apps, currentQuery)?.toItem(),
+            isSearching = currentQuery.isNotBlank(),
+            results = hits.map { app ->
+                SearchResult(app.toItem(), showPackage = (labelCounts[app.label.lowercase()] ?: 0) > 1)
+            },
+            searchMode = settings.searchMode,
             showIcons = settings.showIcons,
         )
     }.stateIn(

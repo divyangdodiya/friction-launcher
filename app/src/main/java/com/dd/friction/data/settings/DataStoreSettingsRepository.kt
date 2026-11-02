@@ -12,6 +12,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.dd.friction.data.apps.LaunchablePackages
 import com.dd.friction.di.IoDispatcher
 import com.dd.friction.domain.model.FrictionSettings
+import com.dd.friction.domain.model.SearchMode
 import com.dd.friction.domain.model.SettingChange
 import com.dd.friction.domain.model.withChange
 import com.dd.friction.domain.repository.SettingsRepository
@@ -59,6 +60,9 @@ class DataStoreSettingsRepository @Inject constructor(
                 .filter(launchablePackages::isLaunchable)
                 .distinct()
                 .take(FrictionSettings.MAX_HOME_APPS),
+            searchMode = this[Keys.SEARCH_MODE]
+                ?.let { stored -> SearchMode.entries.firstOrNull { it.name == stored } }
+                ?: defaults.searchMode,
         )
     }
 
@@ -68,6 +72,7 @@ class DataStoreSettingsRepository @Inject constructor(
         this[Keys.REQUIRE_INTENTION] = settings.requireIntention
         this[Keys.SHOW_ICONS] = settings.showIcons
         this[Keys.HOME_PACKAGES] = settings.homePackages.joinToString(LIST_SEPARATOR)
+        this[Keys.SEARCH_MODE] = settings.searchMode.name
     }
 
     // Package names never contain commas, so a joined string keeps the order a Set would lose.
@@ -80,6 +85,7 @@ class DataStoreSettingsRepository @Inject constructor(
         val REQUIRE_INTENTION = booleanPreferencesKey("require_intention")
         val SHOW_ICONS = booleanPreferencesKey("show_icons")
         val HOME_PACKAGES = stringPreferencesKey("home_packages")
+        val SEARCH_MODE = stringPreferencesKey("search_mode")
     }
 
     private companion object {

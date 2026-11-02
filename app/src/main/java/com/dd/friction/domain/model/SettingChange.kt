@@ -9,6 +9,7 @@ sealed interface SettingChange {
     data class RemoveDistraction(val packageName: String, val label: String) : SettingChange
     data class AddHomeApp(val packageName: String, val label: String) : SettingChange
     data class RemoveHomeApp(val packageName: String) : SettingChange
+    data class Search(val mode: SearchMode) : SettingChange
 
     /**
      * Adding friction is free; removing it requires typing [UnlockPhrase]. This keeps a weak
@@ -23,6 +24,7 @@ sealed interface SettingChange {
         // A distraction on the home screen skips the shuffled menu, even though the wait still applies.
         is AddHomeApp -> packageName in current.distractionPackages && packageName !in current.homePackages
         is RemoveHomeApp -> false
+        is Search -> mode.frictionLevel < current.searchMode.frictionLevel
     }
 }
 
@@ -38,4 +40,5 @@ fun FrictionSettings.withChange(change: SettingChange): FrictionSettings = when 
         else -> copy(homePackages = homePackages + change.packageName)
     }
     is SettingChange.RemoveHomeApp -> copy(homePackages = homePackages - change.packageName)
+    is SettingChange.Search -> copy(searchMode = change.mode)
 }

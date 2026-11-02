@@ -2,7 +2,9 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    # Every branch is built and tested; only main publishes a release (see the last step).
+    # Dependabot branches are covered by their pull request runs.
+    branches-ignore: ['dependabot/**']
   pull_request:
   workflow_dispatch:
 

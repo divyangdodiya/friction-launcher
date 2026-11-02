@@ -30,33 +30,39 @@ assert_alive() {
 
 shot() { adb exec-out screencap -p > "$OUT/$1.png"; }
 
-# Taps the centre of the first on-screen element whose text matches exactly.
-tap_text() {
+dump_ui() {
     adb shell uiautomator dump /sdcard/ui.xml >/dev/null
     adb pull /sdcard/ui.xml "$OUT/ui.xml" >/dev/null
-    local point
-    point=$(python3 - "$OUT/ui.xml" "$1" <<'EOF'
+}
+
+# Prints the centre of the first element whose attribute ($1: text or resource-id) equals $2.
+find_point() {
+    dump_ui
+    python3 - "$OUT/ui.xml" "$1" "$2" <<'PY'
 import re, sys, xml.etree.ElementTree as ET
 for node in ET.parse(sys.argv[1]).iter("node"):
-    if node.get("text") == sys.argv[2]:
+    if node.get(sys.argv[2]) == sys.argv[3]:
         x1, y1, x2, y2 = map(int, re.findall(r"\d+", node.get("bounds")))
         print((x1 + x2) // 2, (y1 + y2) // 2)
         break
-EOF
-)
+PY
+}
+
+tap_by() {
+    local point
+    point=$(find_point "$1" "$2")
     if [ -z "$point" ]; then
-        echo "::error::Could not find '$1' on screen"
+        echo "::error::Could not find $1='$2' on screen"
         exit 1
     fi
     adb shell input tap $point
     sleep 2
 }
 
-screen_has() {
-    adb shell uiautomator dump /sdcard/ui.xml >/dev/null
-    adb pull /sdcard/ui.xml "$OUT/ui.xml" >/dev/null
-    grep -q "text=\"$1\"" "$OUT/ui.xml"
-}
+tap_text() { tap_by text "$1"; }
+tap_id() { tap_by resource-id "$1"; }
+has_id() { [ -n "$(find_point resource-id "$1")" ]; }
+has_text() { [ -n "$(find_point text "$1")" ]; }
 
 log "Install and launch"
 adb install -r "$APK"
@@ -71,7 +77,7 @@ log "Swipe up opens the menu"
 adb shell input swipe $((WIDTH / 2)) $((HEIGHT * 8 / 10)) $((WIDTH / 2)) $((HEIGHT * 2 / 10)) 200
 sleep 2
 assert_alive "open menu"
-screen_has "Type the full app name" || { echo "::error::Menu did not open"; exit 1; }
+has_id "search_field" || { echo "::error::Menu did not open"; exit 1; }
 shot 02-menu
 endlog
 
@@ -88,26 +94,39 @@ adb shell input keyevent KEYCODE_BACK
 sleep 1
 endlog
 
-log "Gate for a distraction app"
+log "Smart search and the gate"
 if adb shell pm list packages | grep -q "package:com.android.chrome$"; then
-    tap_text "Type the full app name"
-    adb shell input text "Chrome"
-    sleep 1
-    tap_text "Open Chrome"
+    tap_id "search_field"
+    # Smart search (default): part of a distraction's name must not reveal it.
+    adb shell input text "Chro"
+    sleep 2
+    shot 05-partial-search
+    if has_id "search_result"; then
+        echo "::error::Partial search revealed a distraction (Chrome) in Smart mode"
+        exit 1
+    fi
+    has_text "No match. Distractions only show up when you type their full name." \
+        || { echo "::error::Missing no-results hint for a partial distraction search"; exit 1; }
+    # Completing the name reveals it, and it opens through the gate.
+    adb shell input text "me"
+    sleep 2
+    shot 06-full-search
+    has_id "search_result" || { echo "::error::Full name did not find Chrome"; exit 1; }
+    tap_id "search_result"
     assert_alive "open gate"
-    screen_has "You are about to open" || { echo "::error::Gate did not open for Chrome"; exit 1; }
-    shot 05-gate
+    has_text "You are about to open" || { echo "::error::Gate did not open for Chrome"; exit 1; }
+    shot 07-gate
     tap_text "Never mind"
     assert_alive "leave gate"
 else
-    echo "::notice::Chrome is not installed on this image; gate check skipped."
+    echo "::notice::Chrome is not installed on this image; search and gate checks skipped."
 fi
 endlog
 
 log "Home button returns home"
 adb shell input keyevent KEYCODE_HOME
 sleep 2
-shot 06-home-again
+shot 08-home-again
 assert_alive "return home"
 endlog
 

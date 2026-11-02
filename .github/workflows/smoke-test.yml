@@ -3,6 +3,8 @@ name: Smoke test
 # Runs the minified release APK on an emulator. Covers what unit tests and lint cannot:
 # a crash at launch or on navigation caused by R8 shrinking or a dependency upgrade.
 on:
+  push:
+    branches-ignore: ['dependabot/**']
   pull_request:
   workflow_dispatch:
 

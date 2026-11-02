@@ -17,9 +17,12 @@
     </plurals>
 
     <!-- Menu -->
-    <string name="menu_search_hint">Type the full app name</string>
+    <string name="menu_search_hint">Search apps</string>
+    <string name="menu_search_hint_exact">Type the full app name</string>
+    <string name="menu_no_results_exact">No app has that exact name.</string>
+    <string name="menu_no_results_smart">No match. Distractions only show up when you type their full name.</string>
+    <string name="menu_no_results_free">No matching app.</string>
     <string name="menu_settings">settings</string>
-    <string name="menu_open_match">Open %1$s</string>
     <string name="menu_marked_distraction">%1$s is now a distraction</string>
 
     <!-- Gate -->
@@ -35,6 +38,13 @@
     <string name="settings_done">done</string>
     <string name="settings_delay_title">Wait before opening a distraction</string>
     <string name="settings_delay_option">%1$ds</string>
+    <string name="settings_search_title">Search</string>
+    <string name="search_mode_exact">Exact</string>
+    <string name="search_mode_smart">Smart</string>
+    <string name="search_mode_free">Free</string>
+    <string name="search_mode_exact_desc">Every app needs its full name.</string>
+    <string name="search_mode_smart_desc">Part of a name finds normal apps. Distractions need their full name.</string>
+    <string name="search_mode_free_desc">Part of a name finds any app, including distractions.</string>
     <string name="settings_intention">Ask why I am opening a distraction</string>
     <string name="settings_icons">Show app icons (grayscale)</string>
     <string name="settings_distractions_title">Distractions</string>
@@ -64,5 +74,6 @@
     <string name="confirm_intention_off">Stop asking why you open distractions.</string>
     <string name="confirm_icons_on">Show app icons in the menu.</string>
     <string name="confirm_remove">Remove %1$s from distractions.</string>
+    <string name="confirm_search">Switch search to %1$s: %2$s</string>
     <string name="confirm_home_add">Put %1$s, a distraction, one tap away on your home screen.</string>
 </resources>

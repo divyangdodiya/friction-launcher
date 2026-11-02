@@ -25,7 +25,7 @@ Most digital wellbeing tools block apps and get switched off. Friction takes a d
 
 **Menu**
 - Every other app in a plain text grid, reshuffled on every visit so muscle memory never forms
-- Search matches only the **full** app name, with no autocomplete
+- Search is configurable: **Smart** (default) finds normal apps by part of their name but shows distractions only when you type their full name; **Exact** needs every full name; **Free** matches anything. Results show grayscale icons, and apps with the same name are all listed
 - Distraction apps carry a small dot; long press any app to mark it
 
 **The gate**
@@ -34,7 +34,7 @@ Most digital wellbeing tools block apps and get switched off. Friction takes a d
 - The big button is *Never mind*; *Open anyway* stays small
 
 **Friction against yourself**
-- Shortening the wait, turning off the question, showing icons, removing a distraction or pinning one to home all require typing *I choose distraction over focus*
+- Shortening the wait, turning off the question, loosening search, showing icons, removing a distraction or pinning one to home all require typing *I choose distraction over focus*
 
 **Privacy**
 - No internet permission, no analytics, no accounts

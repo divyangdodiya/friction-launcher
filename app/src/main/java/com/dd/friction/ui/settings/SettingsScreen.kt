@@ -2,6 +2,7 @@ package com.dd.friction.ui.settings
 
 import android.content.Intent
 import android.provider.Settings
+import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.dd.friction.R
 import com.dd.friction.domain.model.FrictionSettings
 import com.dd.friction.domain.model.InstalledApp
+import com.dd.friction.domain.model.SearchMode
 import com.dd.friction.domain.model.SettingChange
 import com.dd.friction.domain.model.UnlockPhrase
 import com.dd.friction.ui.components.PlainTextButton
@@ -190,6 +192,33 @@ private fun SettingsContent(
                     )
                 }
             }
+        }
+
+        item {
+            SectionTitle(stringResource(R.string.settings_search_title))
+            Row(horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                SearchMode.entries.forEach { mode ->
+                    val selected = mode == settings.searchMode
+                    Text(
+                        text = stringResource(mode.labelRes()),
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                        color = if (selected) {
+                            MaterialTheme.colorScheme.onBackground
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        },
+                        modifier = Modifier
+                            .clickable(role = Role.RadioButton) { onRequest(SettingChange.Search(mode)) }
+                            .padding(vertical = 8.dp),
+                    )
+                }
+            }
+            Text(
+                text = stringResource(settings.searchMode.descriptionRes()),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
 
         item {
@@ -382,6 +411,20 @@ private fun ConfirmDialog(
     )
 }
 
+@StringRes
+private fun SearchMode.labelRes(): Int = when (this) {
+    SearchMode.Exact -> R.string.search_mode_exact
+    SearchMode.Smart -> R.string.search_mode_smart
+    SearchMode.Free -> R.string.search_mode_free
+}
+
+@StringRes
+private fun SearchMode.descriptionRes(): Int = when (this) {
+    SearchMode.Exact -> R.string.search_mode_exact_desc
+    SearchMode.Smart -> R.string.search_mode_smart_desc
+    SearchMode.Free -> R.string.search_mode_free_desc
+}
+
 @Composable
 private fun SettingChange.description(): String = when (this) {
     is SettingChange.Delay -> pluralStringResource(R.plurals.confirm_delay, seconds, seconds)
@@ -389,5 +432,10 @@ private fun SettingChange.description(): String = when (this) {
     is SettingChange.ShowIcons -> stringResource(R.string.confirm_icons_on)
     is SettingChange.RemoveDistraction -> stringResource(R.string.confirm_remove, label)
     is SettingChange.AddHomeApp -> stringResource(R.string.confirm_home_add, label)
+    is SettingChange.Search -> stringResource(
+        R.string.confirm_search,
+        stringResource(mode.labelRes()),
+        stringResource(mode.descriptionRes()),
+    )
     is SettingChange.AddDistraction, is SettingChange.RemoveHomeApp -> ""
 }

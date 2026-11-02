@@ -10,6 +10,7 @@ data class FrictionSettings(
      * the data layer fills it with the device's dialer, SMS app and WhatsApp.
      */
     val homePackages: List<String> = emptyList(),
+    val searchMode: SearchMode = SearchMode.DEFAULT,
 ) {
     companion object {
         const val DEFAULT_DELAY_SECONDS = 15
