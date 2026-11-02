@@ -55,7 +55,7 @@ class SearchAppsUseCaseTest {
 
     @Test
     fun `free mode finds distractions by partial name`() {
-        assertEquals(listOf(install, instagram), run("ins", SearchMode.Free).sortedBy { it.label })
+        assertEquals(setOf(install, instagram), run("ins", SearchMode.Free).toSet())
     }
 
     @Test

@@ -50,7 +50,12 @@ jobs:
           fi
 
       - name: Unit tests
+        id: tests
         run: ./gradlew testDebugUnitTest --stacktrace
+
+      - name: Annotate test failures
+        if: always() && steps.tests.outcome == 'failure'
+        run: python3 .github/scripts/test_annotations.py app/build/test-results/testDebugUnitTest
 
       - name: Lint
         id: lint
